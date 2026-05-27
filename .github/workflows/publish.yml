@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write # required for npm provenance attestation
+  id-token: write # required for OIDC trusted publishing + provenance
 
 jobs:
   publish:
@@ -25,6 +25,10 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
+      # OIDC trusted publishing requires npm >= 11.5.1; the bundled npm is older.
+      - name: Upgrade npm (for OIDC trusted publishing)
+        run: npm install -g npm@latest
+
       - name: Run tests
         run: npm test
 
@@ -38,16 +42,12 @@ jobs:
             exit 1
           fi
 
+      # Tokenless OIDC trusted publishing — no NPM_TOKEN required. Provenance is
+      # generated automatically. One-time setup on npmjs.com: open the package
+      # → Settings → Trusted Publisher → add a GitHub Actions publisher with
+      #   Organization or user: newsdataapi
+      #   Repository:           newsdata-nodejs-client
+      #   Workflow filename:    publish.yml
+      #   Environment:          npm   (optional; matches `environment:` above)
       - name: Publish to npm
         run: npm publish --provenance --access public
-        env:
-          # Create a granular automation token at
-          #   https://www.npmjs.com/settings/<user-or-org>/tokens
-          # and add it as the repo secret NPM_TOKEN.
-          #
-          # Alternatively, once the package exists on npm you can switch to
-          # tokenless OIDC trusted publishing (npm >= 11.5.1): configure a
-          # Trusted Publisher for this repo/workflow at
-          #   https://www.npmjs.com/package/newsdata-nodejs-client/access
-          # and remove this NODE_AUTH_TOKEN line.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
