@@ -18,13 +18,13 @@ Zero runtime dependencies — uses the built-in `fetch` (Node 18+).
 ## Installation
 
 ```bash
-npm install newsdata-node-client
+npm install newsdata-nodejs-client
 ```
 
 ## Quickstart
 
 ```js
-import { NewsDataApiClient, NewsdataError } from 'newsdata-node-client';
+import { NewsDataApiClient, NewsdataError } from 'newsdata-nodejs-client';
 
 const client = new NewsDataApiClient(process.env.NEWSDATA_API_KEY);
 
@@ -45,7 +45,7 @@ try {
 CommonJS:
 
 ```js
-const { NewsDataApiClient } = await import('newsdata-node-client');
+const { NewsDataApiClient } = await import('newsdata-nodejs-client');
 ```
 
 ## Endpoints
@@ -117,7 +117,7 @@ import {
   NewsdataRateLimitError,
   NewsdataApiError,
   NewsdataNetworkError,
-} from 'newsdata-node-client';
+} from 'newsdata-nodejs-client';
 
 try {
   await client.latestApi({ q: 'news' });

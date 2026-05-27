@@ -1,4 +1,4 @@
-// Type definitions for newsdata-node-client.
+// Type definitions for newsdata-nodejs-client.
 
 export type ParamValue = string | number | boolean | Array<string | number>;
 

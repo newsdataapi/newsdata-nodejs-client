@@ -1,5 +1,5 @@
 {
-  "name": "newsdata-node-client",
+  "name": "newsdata-nodejs-client",
   "version": "0.0.1",
   "description": "Official Node.js client (SDK) for the Newsdata.io News API — fetch real-time, historical, crypto, and stock-market news via REST with validation, retries, pagination, and typed errors.",
   "type": "module",
@@ -42,9 +42,9 @@
   "homepage": "https://newsdata.io",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/newsdataapi/newsdata-node-client.git"
+    "url": "git+https://github.com/newsdataapi/newsdata-nodejs-client.git"
   },
   "bugs": {
-    "url": "https://github.com/newsdataapi/newsdata-node-client/issues"
+    "url": "https://github.com/newsdataapi/newsdata-nodejs-client/issues"
   }
 }
