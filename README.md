@@ -2,8 +2,11 @@
 
 # Newsdata.io Node.js Client
 
-[![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/newsdata-nodejs-client?logo=npm&color=cb3837)](https://www.npmjs.com/package/newsdata-nodejs-client)
+[![npm downloads](https://img.shields.io/npm/dm/newsdata-nodejs-client?color=cb3837)](https://www.npmjs.com/package/newsdata-nodejs-client)
+[![CI](https://img.shields.io/github/actions/workflow/status/newsdataapi/newsdata-nodejs-client/ci.yml?branch=main&logo=github&label=CI)](https://github.com/newsdataapi/newsdata-nodejs-client/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-green?logo=node.js)](https://nodejs.org)
+[![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
 </div>
 
