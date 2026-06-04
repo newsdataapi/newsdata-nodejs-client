@@ -1,5 +1,7 @@
 <div align="center">
 
+![Newsdata.io logo](https://raw.githubusercontent.com/newsdataapi/newsdata-nodejs-client/main/newsdata-logo.png)
+
 # Newsdata.io Node.js Client
 
 [![npm version](https://img.shields.io/npm/v/newsdata-nodejs-client?logo=npm&color=cb3837)](https://www.npmjs.com/package/newsdata-nodejs-client)
@@ -172,6 +174,21 @@ and other 4xx errors are never retried.
 ```bash
 npm test        # node --test, runs offline (no API key required)
 ```
+
+## Related libraries
+
+Official Newsdata.io clients across languages and runtimes:
+
+- **Python** — [newsdataapi/python-client](https://github.com/newsdataapi/python-client) ([PyPI](https://pypi.org/project/newsdataapi/))
+- **React (hooks)** — [newsdataapi/newsdata-reactjs-client](https://github.com/newsdataapi/newsdata-reactjs-client) (npm)
+- **PHP** — [newsdataapi/php-client](https://github.com/newsdataapi/php-client) ([Packagist](https://packagist.org/packages/newsdataio/newsdataapi))
+- **Java** — [newsdataapi/newsdata-java-sdk](https://github.com/newsdataapi/newsdata-java-sdk) (Maven Central)
+- **.NET** — [newsdataapi/newsdata-dotnet-sdk](https://github.com/newsdataapi/newsdata-dotnet-sdk) ([NuGet](https://www.nuget.org/packages/Newsdata.Api/))
+- **Go** — [newsdataapi/newsdata-go-client](https://github.com/newsdataapi/newsdata-go-client) (Go modules)
+- **Dart / Flutter** — [newsdataapi/newsdata-flutter-client](https://github.com/newsdataapi/newsdata-flutter-client) (pub.dev)
+- **MCP Server (AI assistants)** — [newsdataapi/newsdata.io-mcp](https://github.com/newsdataapi/newsdata.io-mcp) ([PyPI](https://pypi.org/project/newsdata-mcp/))
+
+Also see [free news datasets](https://github.com/newsdataapi/newsdata.io-free-datasets) for ML / NLP work.
 
 ## License
 
