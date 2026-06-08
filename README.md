@@ -9,6 +9,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/newsdataapi/newsdata-nodejs-client/ci.yml?branch=main&logo=github&label=CI)](https://github.com/newsdataapi/newsdata-nodejs-client/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-green?logo=node.js)](https://nodejs.org)
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-3.1-85EA2D)](https://newsdata.io/openapi.json)
 
 </div>
 
@@ -68,7 +69,8 @@ const { NewsDataApiClient } = await import('newsdata-nodejs-client');
 
 Each `params` value may be a single value or an array (arrays are sent
 comma-separated). Parameter names are case-insensitive. See the
-[Newsdata.io documentation](https://newsdata.io/documentation) for the full
+[Newsdata.io documentation](https://newsdata.io/documentation) — or the
+[OpenAPI 3.1 spec](https://newsdata.io/openapi.json) — for the full
 parameter reference per endpoint.
 
 ## Pagination
