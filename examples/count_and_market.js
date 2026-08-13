@@ -11,7 +11,7 @@ const client = new NewsDataApiClient(process.env.NEWSDATA_API_KEY);
 
 try {
   // Market / financial news.
-  const market = await client.marketApi({ q: 'apple', symbol: 'AAPL' });
+  const market = await client.marketApi({ q: 'apple', market_id: 'AAPL' });
   console.log('market articles:', market.results.length);
 
   // Count endpoints require from_date and to_date.
