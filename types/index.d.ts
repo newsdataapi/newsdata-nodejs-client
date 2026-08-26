@@ -64,6 +64,49 @@ export class NewsDataApiClient {
   cryptoCountApi(params?: EndpointParams): EndpointResult;
   marketCountApi(params?: EndpointParams): EndpointResult;
   sourcesApi(params?: EndpointParams): Promise<NewsdataResponse>;
+
+  /** Register a real-time WebSocket query. POST /1/websocket/register */
+  websocketRegister(params?: EndpointParams): Promise<NewsdataResponse>;
+  /** List the account's registered real-time queries. GET /1/websocket/fetch */
+  websocketFetch(): Promise<NewsdataResponse>;
+  /** Delete a registered real-time query. DELETE /1/websocket/delete */
+  websocketDelete(registrationId: string): Promise<NewsdataResponse>;
+}
+
+export interface WebSocketOptions {
+  /** WebSocket endpoint; defaults to wss://ws.newsdata.io/ws/event. */
+  baseUrl?: string;
+  /** Reconnect automatically on transient drops. Default true. */
+  reconnect?: boolean;
+  /** Milliseconds before the first reconnect; doubles after each failure. */
+  reconnectDelay?: number;
+  /** Upper bound on the reconnect delay, in milliseconds. */
+  reconnectDelayMax?: number;
+  /** Milliseconds to wait for the opening handshake. */
+  openTimeout?: number;
+  /** WebSocket implementation; defaults to the global one (Node 22+). */
+  WebSocket?: new (url: string) => unknown;
+}
+
+/**
+ * NewsData.io real-time WebSocket service: registers, lists, and deletes the
+ * account's real-time queries, and streams the responses for one of them.
+ */
+export class NewsDataApiWebSocket {
+  constructor(client: NewsDataApiClient, options?: WebSocketOptions);
+
+  /** Register a real-time query. */
+  websocketRegister(params?: EndpointParams): Promise<NewsdataResponse>;
+  /** List the account's registered real-time queries. */
+  websocketFetch(): Promise<NewsdataResponse>;
+  /** Delete a registered real-time query. */
+  websocketDelete(registrationId: string): Promise<NewsdataResponse>;
+
+  /** Yield each response for `registrationId` as it arrives. */
+  stream(registrationId: string): AsyncGenerator<NewsdataResponse, void, unknown>;
+
+  /** Close the active connection, ending any in-flight `stream()`. */
+  close(): void;
 }
 
 export function redactApiKey(url: string): string;
@@ -89,5 +132,9 @@ export class NewsdataServerError extends NewsdataApiError {}
 export class NewsdataNetworkError extends NewsdataError {
   cause?: Error;
 }
+export class NewsdataWebSocketError extends NewsdataError {
+  cause?: Error;
+}
+export class NewsdataWebSocketAuthError extends NewsdataWebSocketError {}
 
 export as namespace newsdata;
