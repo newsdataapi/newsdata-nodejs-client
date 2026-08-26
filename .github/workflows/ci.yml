@@ -21,7 +21,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18, 20, 22]
+        # 22 is the floor: the real-time WebSocket client uses the global
+        # WebSocket, which Node ships from 22.
+        node-version: [22, 24]
     steps:
       - uses: actions/checkout@v4
 
