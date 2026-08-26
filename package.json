@@ -1,7 +1,7 @@
 {
   "name": "newsdata-nodejs-client",
-  "version": "0.1.0",
-  "description": "Official Node.js client (SDK) for the Newsdata.io News API \u2014 fetch real-time, historical, crypto, and stock-market news via REST with validation, retries, pagination, and typed errors.",
+  "version": "0.2.0",
+  "description": "Official Node.js client (SDK) for the Newsdata.io News API — fetch real-time, historical, crypto, and stock-market news via REST with validation, retries, pagination, and typed errors.",
   "type": "module",
   "main": "src/index.js",
   "types": "types/index.d.ts",
