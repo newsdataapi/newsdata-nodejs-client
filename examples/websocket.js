@@ -60,7 +60,7 @@ console.log(`streaming ${registrationId} — Ctrl-C to stop`);
 try {
   for await (const response of ws.stream(registrationId)) {
     for (const article of response.results ?? []) {
-      console.log(`${article.title} - ${article.link}`);
+      console.log(`${article.title} - ${article.url}`);
     }
   }
 } catch (err) {

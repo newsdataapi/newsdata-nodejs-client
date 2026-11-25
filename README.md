@@ -59,6 +59,57 @@ const { NewsDataApiClient } = await import('newsdata-nodejs-client');
 
 ## Endpoints
 
+The API has two versions. v2 is the current one; the v1 methods keep working
+unchanged.
+
+### v2
+
+| Method | Endpoint | Notes |
+|--------|----------|-------|
+| `news(params)` | `/2/news` | Latest news, or historical with `from_date` / `to_date` |
+| `market(params)` | `/2/market` | Market / financial news |
+| `crypto(params)` | `/2/crypto` | Cryptocurrency news |
+| `sources(params)` | `/2/sources` | Available sources (single page) |
+| `countNews(params)` | `/2/count/news` | Aggregate news counts |
+| `countMarket(params)` | `/2/count/market` | Aggregate market counts |
+| `countCrypto(params)` | `/2/count/crypto` | Aggregate crypto counts |
+| `websocketRegister(params)` | `/2/websocket/register` | Register a real-time query |
+| `websocketFetch()` | `/2/websocket/fetch` | List registered queries |
+| `websocketDelete(id)` | `/2/websocket/delete` | Delete a registered query |
+
+v2 renames the filter vocabulary to snake_case and folds the four domain
+filters into two:
+
+| v1 | v2 |
+|----|----|
+| `qInTitle`, `qInMeta` | `q_in_title`, `q_in_meta` |
+| `excludecountry`, `excludecategory`, `excludelanguage` | `exclude_country`, `exclude_category`, `exclude_language` |
+| `domain`, `domainurl`, `excludedomain`, `excludedomainurl` | `source_url`, `exclude_source_url` |
+| `prioritydomain` | `source_priority` |
+| `full_content` | `content` |
+| `removeduplicate`, `excludefield` | `remove_duplicate`, `exclude_field` |
+
+`coin` and `market_id` keep their names. v2 also accepts `raw_query` on every
+endpoint, `sources` included.
+
+v2 responses carry `total_results` and `next_page` where v1 carries
+`totalResults` and `nextPage`; `scroll` merges under whichever pair the
+endpoint uses.
+
+```js
+const res = await client.news({
+  q_in_title: 'tesla',
+  source_url: 'bbc.com',
+  content: true,
+});
+console.log(res.total_results, res.next_page);
+```
+
+There is no `/2/archive` — `news()` covers historical news through
+`from_date` / `to_date`.
+
+### v1
+
 | Method | Endpoint | Notes |
 |--------|----------|-------|
 | `latestApi(params)` | `/1/latest` | Real-time news |
@@ -69,9 +120,8 @@ const { NewsDataApiClient } = await import('newsdata-nodejs-client');
 | `countApi(params)` | `/1/count` | Aggregate counts (requires `from_date`, `to_date`) |
 | `cryptoCountApi(params)` | `/1/crypto/count` | Aggregate crypto counts (requires dates) |
 | `marketCountApi(params)` | `/1/market/count` | Aggregate market counts (requires dates) |
-| `websocketRegister(params)` | `/1/websocket/register` | Register a real-time query |
-| `websocketFetch()` | `/1/websocket/fetch` | List registered queries |
-| `websocketDelete(id)` | `/1/websocket/delete` | Delete a registered query |
+
+The real-time service is v2 only — there are no v1 WebSocket methods.
 
 Each `params` value may be a single value or an array (arrays are sent
 comma-separated). Parameter names are case-insensitive. See the
@@ -107,7 +157,8 @@ against the endpoint's allowed keys.
 
 ## Real-time news (WebSocket)
 
-Register a query first — the returned `registration_id` identifies it from then on:
+The real-time service is part of API v2. Register a query first — the returned
+`registration_id` identifies it from then on:
 
 ```js
 import { NewsDataApiClient, NewsDataApiWebSocket } from 'newsdata-nodejs-client';
@@ -119,20 +170,31 @@ const { results } = await ws.websocketRegister({ q: 'bitcoin', language: 'en' })
 const registrationId = results.registration_id;
 ```
 
-`websocketRegister` takes the familiar filter parameters (`q`, `country`,
-`language`, `domain`, …) — no date or paging filters, since a registered query
-matches news as it is published. Registering an identical query twice rejects
-with a `NewsdataApiError` whose `statusCode` is 409; the existing id is at
-`err.responseBody.results.registration_id`. `websocketFetch()` lists every
-registered query and `websocketDelete(id)` removes one.
+`websocketRegister` takes the same filter parameters as `news()`, under the
+same names (`q`, `q_in_title`, `country`, `exclude_country`, `source_url`,
+`content`, `exclude_field`, `timezone`, …) — the date, paging and sorting
+filters, `id` and `url` don't apply to a standing query. Registering an
+identical query twice rejects with a `NewsdataApiError` whose `statusCode` is
+409; the existing id is at `err.responseBody.results.registration_id`.
 
-Then stream — each response has the familiar `status` / `totalResults` /
-`results` shape:
+`websocketFetch()` lists every registered query: `results` is an array with one
+entry per query, carrying its `registration_id`, the filters it was registered
+with (`query`), how many devices are streaming it now (`active_clients`) and
+when one last connected (`last_used`, UTC). `websocketDelete(id)` removes one.
+Once every registration the plan allows is in use, registering another rejects
+with a 429 `NewsdataRateLimitError` carrying the code
+`RegistrationLimitExceeded`; it is not retried, since only deleting a
+registration frees a slot.
+
+Then stream. Each response has `status`, `total_results` and `results` keys, and
+its articles carry the same v2 layout as `news()` results (`id`, `url`,
+`published_at`, …, with related fields grouped under `media`, `source` and
+`ai`); the registration's `exclude_field` and `timezone` apply to them:
 
 ```js
 for await (const response of ws.stream(registrationId)) {
   for (const article of response.results) {
-    console.log(article.title, '-', article.link);
+    console.log(article.title, '-', article.url);
   }
 }
 ```
@@ -244,6 +306,10 @@ NewsdataError                       (catch-all base)
 ├── NewsdataApiError                (.statusCode, .responseBody)
 │   ├── NewsdataAuthError           (401 / 403)
 │   ├── NewsdataRateLimitError      (429; .retryAfter)
+│   │   ├── NewsdataApiLimitExceededError      (account credits gone)
+│   │   └── NewsdataApiKeyLimitExceededError   (this key's cap gone)
+│   │   (RegistrationLimitExceeded stays on NewsdataRateLimitError —
+│   │    real-time registration slots, not credits)
 │   └── NewsdataServerError         (5xx)
 ├── NewsdataNetworkError            (.cause)
 └── NewsdataWebSocketError          (real-time stream)
@@ -262,15 +328,29 @@ const client = new NewsDataApiClient(apiKey, {
   maxResult: null,          // default cap for scroll mode
   maxPages: null,           // default cap for paginate mode
   includeHeaders: false,    // attach responseHeaders to results
-  baseUrl: undefined,       // override for staging/proxy
+  baseUrl: undefined,       // API root, no version segment; staging/proxy
   fetch: undefined,         // inject a custom fetch
   logger: console,          // optional { debug, info, warn }; API key is redacted
 });
 ```
 
+`baseUrl` is the API root **without** a version segment; the default is
+`https://newsdata.io/api` and the client adds `/1/…` or `/2/…` itself. Before
+0.3.0 it included the version (`https://newsdata.io/api/1/`), so drop the
+trailing `/1/` if you override it.
+
 Retries cover network errors, HTTP 429, and 5xx. 429 honors the `Retry-After`
 header (integer seconds or HTTP-date); otherwise backoff is exponential. Auth
 and other 4xx errors are never retried.
+
+A 429 that waiting cannot fix is never retried.
+`NewsdataApiLimitExceededError` means the account's whole credit pool is
+exhausted, `NewsdataApiKeyLimitExceededError` means this one key hit its own
+cap while the account may still have credits; both subclass
+`NewsdataRateLimitError`, so existing `catch` blocks keep working.
+`RegistrationLimitExceeded` is also never retried, but keeps the plain
+`NewsdataRateLimitError` class — it is about real-time registration slots, not
+credits, and is fixed by deleting a registration.
 
 ## Development
 

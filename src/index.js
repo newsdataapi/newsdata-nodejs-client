@@ -8,6 +8,8 @@ export {
   NewsdataApiError,
   NewsdataAuthError,
   NewsdataRateLimitError,
+  NewsdataApiLimitExceededError,
+  NewsdataApiKeyLimitExceededError,
   NewsdataServerError,
   NewsdataNetworkError,
   NewsdataWebSocketError,
